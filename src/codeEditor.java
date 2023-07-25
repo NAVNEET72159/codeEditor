@@ -27,14 +27,12 @@ public class codeEditor extends JFrame {
     private JTree fileTree;
     private JSplitPane sideBar;
     JFileChooser fileChooser;
-    private JList<String> fileList;
-    private DefaultListModel<String> fileListModel;
-    private Map<String, ImageIcon> fileIconMap;
+    private JScrollPane scrollPane;
+    private final Map<String, ImageIcon> fileIconMap;
     private DefaultMutableTreeNode selectedNode, newNode;
     private DefaultTreeModel treeModel;
     private File parentDir;
     private File folder;
-    private JScrollPane scrollPane;
     private JTabbedPane tabbedPane;
     private final Map<String, Component> openedFiles;
     private final String[] programmingExtensions = new String[]{"java", "cpp", "py", "html", "css", "js", "c", "ipynb"};
