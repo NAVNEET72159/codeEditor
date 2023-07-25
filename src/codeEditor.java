@@ -6,6 +6,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import javax.swing.undo.UndoManager;
@@ -59,6 +60,7 @@ public class codeEditor extends JFrame {
         createStatusBar();
         createToolbar();
         createContentPane();
+        loadFileIcons();
         setVisible(true);
     }
 
@@ -679,6 +681,25 @@ public class codeEditor extends JFrame {
                 }
             }
         });
+
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
+            @Override
+            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                if (value instanceof DefaultMutableTreeNode node) {
+                    if (node.getUserObject() instanceof String fileName) {
+                        String extension = getFileExtension(fileName);
+                        ImageIcon icon = fileIconMap.getOrDefault(extension, null);
+                        if (icon != null) {
+                            setIcon(icon);
+                        }
+                    }
+                }
+                return this;
+            }
+        };
+
+        fileTree.setCellRenderer(renderer);
 
         JScrollPane treeScrollPane = new JScrollPane(fileTree);
         treeScrollPane.setBackground(Color.DARK_GRAY);
