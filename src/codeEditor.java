@@ -685,9 +685,17 @@ public class codeEditor extends JFrame {
         treeScrollPane.setForeground(Color.WHITE);
         treeScrollPane.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
         treeScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        treeScrollPane.setPreferredSize(new Dimension(200, getHeight()));
+        treeScrollPane.setMaximumSize(new Dimension(200, getHeight()));
+        treeScrollPane.setMinimumSize(new Dimension(0, getHeight()));
 
         sideBarPanel.add(treeScrollPane, BorderLayout.CENTER);
         sideBar.add(sideBarPanel, JSplitPane.LEFT);
+        sideBar.setDividerLocation(200);
+        sideBar.setEnabled(false);
+        sideBar.setPreferredSize(new Dimension(200, getHeight()));
+        sideBar.setMaximumSize(new Dimension(200, getHeight()));
+        sideBar.setMinimumSize(new Dimension(0, getHeight()));
         return sideBar;
     }
 
