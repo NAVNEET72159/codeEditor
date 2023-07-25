@@ -35,7 +35,6 @@ public class codeEditor extends JFrame {
     private File parentDir;
     private File folder;
     private JScrollPane scrollPane;
-    private DefaultMutableTreeNode root;
     private JTabbedPane tabbedPane;
     private final Map<String, Component> openedFiles;
     private final String[] programmingExtensions = new String[]{"java", "cpp", "py", "html", "css", "js", "c", "ipynb"};
@@ -665,6 +664,7 @@ public class codeEditor extends JFrame {
         fileTree.setBackground(Color.DARK_GRAY);
         fileTree.setForeground(Color.WHITE);
         fileTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        fileTree.setCellRenderer(new FileTreeCellRenderer());
         fileTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
@@ -675,31 +675,15 @@ public class codeEditor extends JFrame {
                     String fileName = nodeInfo.toString();
                     if (isProgrammingFile(getFileExtension(fileName)) || isImageFile(getFileExtension(fileName))) {
                         File selectedFile = new File(folder.getPath() + File.separator + fileName);
-                        openFileInEditor(selectedFile, textArea);
-                        tabbedPane.setSelectedComponent(textArea);
+                        JTabbedPane mainTabbedPane = new JTabbedPane();
+                        JTextPane newFileTextPane = new JTextPane();
+                        mainTabbedPane.addTab(selectedFile.getName(), newFileTextPane); // Use mainTabbedPane instead of tabbedPane
+                        openFileInEditor(selectedFile, newFileTextPane); // Pass the new JTextPane instance
+                        addFileToNavBar(selectedFile.getName(), newFileTextPane);
                     }
                 }
             }
         });
-
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
-            @Override
-            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                if (value instanceof DefaultMutableTreeNode node) {
-                    if (node.getUserObject() instanceof String fileName) {
-                        String extension = getFileExtension(fileName);
-                        ImageIcon icon = fileIconMap.getOrDefault(extension, null);
-                        if (icon != null) {
-                            setIcon(icon);
-                        }
-                    }
-                }
-                return this;
-            }
-        };
-
-        fileTree.setCellRenderer(renderer);
 
         JScrollPane treeScrollPane = new JScrollPane(fileTree);
         treeScrollPane.setBackground(Color.DARK_GRAY);
@@ -718,6 +702,29 @@ public class codeEditor extends JFrame {
         sideBar.setMaximumSize(new Dimension(200, getHeight()));
         sideBar.setMinimumSize(new Dimension(0, getHeight()));
         return sideBar;
+    }
+
+    private class FileTreeCellRenderer extends DefaultTreeCellRenderer {
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
+                                                      boolean leaf, int row, boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            Object userObject = node.getUserObject();
+
+            if (userObject instanceof File file) {
+                String name = file.getName();
+                if (file.isDirectory()) {
+                    setIcon(fileIconMap.get("folder")); // Set custom folder icon
+                } else {
+                    String extension = getFileExtension(name);
+                    setIcon(fileIconMap.getOrDefault(extension, fileIconMap.get("file"))); // Set custom file icon or default file icon
+                }
+            }
+
+            return this;
+        }
     }
 
     private void loadFolderIntoSidebar(File folder, DefaultMutableTreeNode parentDir) {
